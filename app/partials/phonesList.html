@@ -1,0 +1,10 @@
+<ul>
+    <li ng-repeat="phone in phoneList">
+        <a href="#/details/{{ phone.id }}">
+            <fieldset>
+                <h4><img width="80px" src="{{ phone.imageUrl }}" alt=""/>{{ phone.id }}</h4>
+                <p>{{ phone.snippet}}</p>
+            </fieldset>
+        </a>
+    </li>
+</ul>
