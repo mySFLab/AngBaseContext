@@ -1,51 +1,43 @@
 'use strict';
 
 /* Services */
-mainMod.factory('phonesFactory', function() {
-    console.log('dans la factory');
-    var factory =  {
-        phones: [
-            {
-                "age": 0,
-                "id": "motorola-xoom-with-wi-fi",
-                "imageUrl": "img/phones/motorola-xoom-with-wi-fi.0.jpg",
-                "name": "Motorola XOOM\u2122 with Wi-Fi",
-                "snippet": "The Next, Next Generation\r\n\r\nExperience the future with Motorola XOOM with Wi-Fi, the world's first tablet powered by Android 3.0 (Honeycomb)."
+mainMod.factory('phonesFactory', ["$http","$q",
+    function($http, $q) {
+        var factory =  {
+            phones: [],
+            getPosts: function() {
+
+                // ==== Instanciation d'une promesse pour le traitement asynchrone. ====
+                var defered = $q.defer();
+                $http.get('phones/phones.json').then(function(data) {
+                    // --- On save les données dans la factory pour limiter les calls futures ---
+                    factory.phones = data;
+                    defered.resolve(factory.phones);
+                }, function(){
+                    defered.reject('Probleme de connexion au WS');
+                });
+
+                return defered.promise;
             },
-            {
-                "age": 1,
-                "id": "motorola-xoom",
-                "imageUrl": "img/phones/motorola-xoom.0.jpg",
-                "name": "MOTOROLA XOOM\u2122",
-                "snippet": "The Next, Next Generation\n\nExperience the future with MOTOROLA XOOM, the world's first tablet powered by Android 3.0 (Honeycomb)."
-            },
-            {
-                "age": 2,
-                "carrier": "AT&T",
-                "id": "motorola-atrix-4g",
-                "imageUrl": "img/phones/motorola-atrix-4g.0.jpg",
-                "name": "MOTOROLA ATRIX\u2122 4G",
-                "snippet": "MOTOROLA ATRIX 4G the world's most powerful smartphone."
+            getPost: function(id) {
+                console.log('id demande : '+ id);
+                console.log(factory.phones);
+                var toutlesposts = factory.getPosts();
+                // --- Gestion des données une fois la promesses + data faites ---
+                toutlesposts.then(function(data) {
+                    console.log('success');
+                    console.log(data)});
+                var phoneFinded = {};
+                angular.forEach(factory.phones, function(phone, key) {
+                    if (id == phone.id) {
+                        phoneFinded = phone;
+                    }
+                });
+                return phoneFinded;
             }
-        ],
-        getPosts: function(){
-            console.log('je return post');
-        },
-        getPost: function(id) {
-            console.log('id demande : '+ id)
-            console.log(factory.post);
+        };
 
-            var phoneFinded = {};
-            angular.forEach(factory.phones, function(phone, key) {
-                console.log('valeur key : '+key+' valeur phone.name'+ phone.name);
-                if (id == phone.id) {
-                    phoneFinded = phone;
-                }
-            });
-            return phoneFinded;
-        }
-    };
-
-    return factory;
-})
+        return factory;
+    }
+])
 
